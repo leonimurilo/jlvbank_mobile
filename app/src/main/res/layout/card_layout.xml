@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_margin="20dp"
+        android:layout_height="140dp"
+        card_view:cardCornerRadius="10dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <View
+                    android:id="@+id/blue_view"
+                    android:background="@drawable/auhasuhasuhsa"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp">
+
+                </View>
+
+                <TextView
+                    android:id="@+id/text_view_card_number"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="17sp"
+                    android:textColor="#ffffff"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4444 2234 5434 XXXX"/>
+
+
+                <ImageView
+                    android:id="@+id/lock_image"
+                    android:visibility="invisible"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_lock_black_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+                <TextView
+                    android:id="@+id/card_type"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/blue_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Platinum"
+                    android:textSize="19sp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:weightSum="6"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp">
+
+                <Button
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:textColor="@color/colorAccent"
+                    android:id="@+id/button_view_postings"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="View postings"
+                    />
+
+                <Button
+                    android:id="@+id/button_lock_card"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:textColor="@color/colorAccent"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="Lock"/>
+
+                <Button
+                    android:id="@+id/button_more"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:textColor="@color/colorAccent"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="More Details"/>
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+        
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>

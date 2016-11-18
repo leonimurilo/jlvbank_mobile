@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="5dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp" />
+
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_margin="20dp"
+                android:id="@+id/posting_view_icon"
+                android:layout_marginRight="0dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:id="@+id/posting_view_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burguer King Av Brasil"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/posting_view_value"
+                android:layout_below="@+id/posting_view_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="R$29,80"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/posting_view_date"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/posting_view_description"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:text="22/09/16"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="45dp"
+        android:layout_width="match_parent"
+        android:background="#eaeaea"
+        android:layout_height="1dp"></View>
+
+</LinearLayout>
