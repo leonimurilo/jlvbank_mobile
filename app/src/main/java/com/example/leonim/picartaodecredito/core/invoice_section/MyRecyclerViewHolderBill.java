@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.dbo.Release;
 
 /**
  * Created by leonim on 13/10/2016.
@@ -15,8 +16,7 @@ import com.example.leonim.picartaodecredito.R;
 
 public class MyRecyclerViewHolderBill extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-
-    private int releaseId;
+    private Release release;
     private View view;
     private ImageView iconImageView;
     private TextView descriptionTextView;
@@ -34,7 +34,7 @@ public class MyRecyclerViewHolderBill extends RecyclerView.ViewHolder implements
         descriptionTextView = (TextView) view.findViewById(R.id.posting_view_description);
         valueTextView = (TextView) view.findViewById(R.id.posting_view_value);
         dateTextView = (TextView) view.findViewById(R.id.posting_view_date);
-        releaseId = -1;
+        release = null;
         view.setOnClickListener(this);
         iconImageView.setOnClickListener(this);
         dateTextView.setOnClickListener(this);
@@ -62,15 +62,15 @@ public class MyRecyclerViewHolderBill extends RecyclerView.ViewHolder implements
         this.valueTextView.setText(d);
     }
 
-    public void setReleaseId(int releaseId){
-        this.releaseId = releaseId;
+    public void setReleaseId(Release release){
+        this.release = release;
     }
 
     @Override
     public void onClick(View view) {
 
         if(this.view.getId()==view.getId()){
-            onReleaseInteractionListener.onReleaseSelected(releaseId);
+            onReleaseInteractionListener.onReleaseSelected(release);
         }
 
         if(view.getId()==iconImageView.getId()){

@@ -33,7 +33,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".core.PostingDetailsActivity"></activity>
+        <activity android:name=".core.PostingDetailsActivity"
+            android:label="Details about the release">
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

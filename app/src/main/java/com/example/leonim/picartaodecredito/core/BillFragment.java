@@ -17,9 +17,11 @@ import android.widget.Toast;
 import com.example.leonim.picartaodecredito.core.invoice_section.MyRecyclerAdapterBill;
 import com.example.leonim.picartaodecredito.core.invoice_section.OnReleaseInteractionListener;
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.dbo.CreditCard;
 import com.example.leonim.picartaodecredito.dbo.Invoice;
 import com.example.leonim.picartaodecredito.dbo.Release;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,10 +29,12 @@ import java.util.Date;
 public class BillFragment extends android.support.v4.app.Fragment {
 
     private View myFragmentView;
-    private static final String[] reportOptions = {"2343 6564 2324 6556","6555 6232 2324 0012"};
     private MyRecyclerAdapterBill listAdapter;
     private Spinner spinner;
     private RecyclerView recyclerView;
+    private MainActivity myActivity;
+    private ArrayList<String> reportOptions;
+    private OnReleaseInteractionListener onReleaseInteractionListener;
 
     public BillFragment() {
         // Required empty public constructor
@@ -81,6 +85,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
         recyclerView = (RecyclerView) myFragmentView.findViewById(R.id.bill_recycler);
         spinner = (Spinner) myFragmentView.findViewById(R.id.choose_card_spinner);
 
+        reportOptions = new ArrayList<>();
         return myFragmentView;
     }
 
@@ -88,48 +93,68 @@ public class BillFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Log.d("started","fragmento iniciado");
+        myActivity = ((MainActivity)getActivity());
 
-        ArrayList<Release> releaseArrayList = new ArrayList<>();
-
-        for(int i=0;i<6;i++){
-            Release p = new Release(i,i*2000,"Buy","Outback Iguatemi",new Date(i*1000*60*60*24),12);
-            releaseArrayList.add(p);
-        }
-
-        releaseArrayList.add(new Release(68688,23.90,"Buy","Apple Store",new Date(),12));
-
-        Invoice i = new Invoice("","",new Date(2016, Calendar.AUGUST, 1),new Date(2016, Calendar.AUGUST, 1),1,false,releaseArrayList,new Date(2016, Calendar.JULY, 1),222.00);
-        Invoice j = new Invoice("","",new Date(),new Date(),1,false,releaseArrayList,new Date(),288.00);
-        ArrayList<Invoice> invoiceArrayList = new ArrayList<>();
-
-        invoiceArrayList.add(i);
-        invoiceArrayList.add(j);
-
-        RecyclerView.LayoutManager layout = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layout);
-
-        OnReleaseInteractionListener onReleaseInteractionListener = new OnReleaseInteractionListener() {
+        onReleaseInteractionListener = new OnReleaseInteractionListener() {
             @Override
-            public void onReleaseSelected(int postingId) {
+            public void onReleaseSelected(Release r) {
                 //open detail activity
                 Intent i = new Intent(getContext(),PostingDetailsActivity.class);
-                i.putExtra("releaseId",postingId);
+                i.putExtra("releaseValue",r.getValue());
+                i.putExtra("releaseType",r.getType());
+                i.putExtra("releaseDescription",r.getDescription());
+                i.putExtra("releaseDate",new SimpleDateFormat("dd/MM/yy").format(r.getDate()));
+
                 startActivity(i);
 
             }
         };
 
-        listAdapter = new MyRecyclerAdapterBill(invoiceArrayList,this.getContext(),onReleaseInteractionListener);
-        recyclerView.setAdapter(listAdapter);
+        RecyclerView.LayoutManager layout = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layout);
+        setFragmentContent();
 
 
-        ArrayAdapter<String> ccListAdapter = new ArrayAdapter<>(this.getContext(),R.layout.simple_list_item_1,reportOptions);
-        spinner.setAdapter(ccListAdapter);
+    }
 
+    private void setFragmentContent(){
+        refreshSpinnerOptions();
+        Log.d("chubaka","wtf1");
+        refreshRecyclerView();
+
+    }
+
+
+    private void refreshRecyclerView(){
+        int index = spinner.getSelectedItemPosition();
+        Log.d("chubaka","COMO TA: "+myActivity.cards.get(index).getInvoiceArrayList());
+        try{
+
+            MyRecyclerAdapterBill myRecyclerAdapterBill = new MyRecyclerAdapterBill(myActivity.cards.get(index).getInvoiceArrayList(),getContext(),onReleaseInteractionListener);
+            recyclerView.setAdapter(myRecyclerAdapterBill);
+        }catch (Exception e){
+
+        }
+
+    }
+
+    private void refreshSpinnerOptions(){
+        Log.d("chubaka","wtf2");
+        reportOptions.clear();
+        for(CreditCard creditCard:myActivity.cards){
+            reportOptions.add(creditCard.getNumber()+"");
+        }
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getContext(),android.R.layout.simple_spinner_dropdown_item,reportOptions);
+        spinner.setAdapter(spinnerAdapter);
     }
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void updateRecyclerView(){
+        listAdapter.notifyDataSetChanged();
     }
 
 
@@ -144,8 +169,10 @@ public class BillFragment extends android.support.v4.app.Fragment {
         try{
             Toast.makeText(getContext(),creditCardNumber,Toast.LENGTH_SHORT).show();
 
-            spinner.setSelection(java.util.Arrays.asList(reportOptions).indexOf(creditCardNumber));
-            //reset adapter to the postings related to the credit card
+            int index = reportOptions.indexOf(creditCardNumber);
+            spinner.setSelection(index);
+            listAdapter = new MyRecyclerAdapterBill(myActivity.cards.get(index).getInvoiceArrayList(),this.getContext(),onReleaseInteractionListener);
+            recyclerView.setAdapter(listAdapter);
         }catch (Exception e){
             Log.d("Exception",e.getMessage());
         }

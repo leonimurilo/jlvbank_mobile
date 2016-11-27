@@ -29,12 +29,20 @@ public class MyRecyclerAdapterBill extends RecyclerView.Adapter {
     private static final int COMMON = 1;
     private static final int SEPARATOR = 2;
 
-    public MyRecyclerAdapterBill(ArrayList<Invoice> invoiceArrayList, Context context, OnReleaseInteractionListener onReleaseInteractionListener){
+    public MyRecyclerAdapterBill(ArrayList<Invoice> invoiceArrayList, Context context, OnReleaseInteractionListener onReleaseInteractionListener) throws Exception{
         this.invoiceArrayList = invoiceArrayList;
         this.context = context;
         this.onReleaseInteractionListener = onReleaseInteractionListener;
 
         itemTypes = new ArrayList<>();
+
+        if(invoiceArrayList==null)
+            throw new Exception("Error. invoice arrayList is null");
+        if(onReleaseInteractionListener==null)
+            throw new Exception("Error. callback is null");
+        if(context==null)
+            throw new Exception("Error. context is null");
+
 
         for(int i=0;i<invoiceArrayList.size();i++){
             itemTypes.add(SEPARATOR);
@@ -94,7 +102,7 @@ public class MyRecyclerAdapterBill extends RecyclerView.Adapter {
 
             holder.setDateText(new SimpleDateFormat("dd/MM/yy").format(release.getDate()));
             holder.setValueTextView(release.getValue()+"");
-            holder.setReleaseId(release.getId());
+            holder.setReleaseId(release);
 
         }else if(h.getClass()==MyRecyclerViewHolderSeparator.class){
             MyRecyclerViewHolderSeparator holder = (MyRecyclerViewHolderSeparator) h;
@@ -113,6 +121,15 @@ public class MyRecyclerAdapterBill extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         int releasesCount = 0;
+        if(invoiceArrayList==null)
+            return 0;
+        for(int i=0;i<invoiceArrayList.size();i++){
+            for(Release r : invoiceArrayList.get(i).getReleases()){
+                if(r==null)
+                    return 0;
+            }
+        }
+
 
         for(Invoice i:invoiceArrayList){
             releasesCount+=i.getReleases().size();

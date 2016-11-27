@@ -13,20 +13,33 @@ import com.example.leonim.picartaodecredito.R;
  */
 public class PostingDetailsActivity extends AppCompatActivity {
 
-    private TextView idTextView;
+    private TextView valueTextView;
+    private TextView typeTextView;
+    private TextView descriptionTextView;
+    private TextView dateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting_details);
 
-        idTextView = (TextView) findViewById(R.id.releaseId);
+        valueTextView = (TextView) findViewById(R.id.release_value);
+        typeTextView = (TextView) findViewById(R.id.release_type);
+        descriptionTextView = (TextView) findViewById(R.id.release_description);
+        dateTextView = (TextView) findViewById(R.id.release_date);
 
 
         Intent intent = getIntent();
-        int releaseId = intent.getIntExtra("releaseId",-1);
+        //check existence
+        double releaseId = intent.getDoubleExtra("releaseValue",-1);
+        String date = intent.getStringExtra("releaseType");
+        String description = intent.getStringExtra("releaseDescription");
+        String type = intent.getStringExtra("releaseDate");
 
-        idTextView.setText(releaseId+"");
+        valueTextView.setText(releaseId+"");
+        descriptionTextView.setText(description);
+        typeTextView.setText(type);
+        dateTextView.setText(date);
     }
 
 

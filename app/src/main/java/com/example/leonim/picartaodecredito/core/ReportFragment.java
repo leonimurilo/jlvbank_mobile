@@ -38,6 +38,7 @@ public class ReportFragment extends android.support.v4.app.Fragment {
     private MyRecyclerAdapterCardSelector adapterCardSelector;
     private OnViewPostingsButtonClickListener onViewPostingsClickListener;
     private OnCardInteractionListener onLockCardButtonClickListener;
+    private MainActivity myActivity;
 
     public ReportFragment() {
         // Required empty public constructor
@@ -145,21 +146,28 @@ public class ReportFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        myActivity = ((MainActivity)getActivity());
+
         cardSelectorRecyclerView = (RecyclerView) myFragmentView.findViewById(R.id.report_recycler);
 
         ArrayList<CreditCard> arrayList = new ArrayList<>();
 
-        arrayList.add(new CreditCard(10,"22224444999955555","943",new Date(),"Visa","Joao","Gold",false));
-        arrayList.add(new CreditCard(50,"23944837843843434","923",new Date(),"Master card","Joao","Silver",false));
+        //arrayList.add(new CreditCard(10,"22224444999955555","943",new Date(),"Visa","Joao","Gold",false));
+        //arrayList.add(new CreditCard(50,"23944837843843434","923",new Date(),"Master card","Joao","Silver",false));
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
         cardSelectorRecyclerView.setLayoutManager(layout);
 
-        adapterCardSelector = new MyRecyclerAdapterCardSelector(arrayList,this.getContext());
+        try{
+            adapterCardSelector = new MyRecyclerAdapterCardSelector(myActivity.cards,this.getContext());
+        }catch (Exception e){
+
+        }
+
         adapterCardSelector.setOnViewPostingsClickListener(onViewPostingsClickListener);
         adapterCardSelector.setOnLockCardButtonClickListener(onLockCardButtonClickListener);
 
-        cardSelectorRecyclerView.setAdapter(adapterCardSelector);
+        //cardSelectorRecyclerView.setAdapter(adapterCardSelector);
 
     }
 

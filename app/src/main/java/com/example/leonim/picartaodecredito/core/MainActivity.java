@@ -1,8 +1,13 @@
 package com.example.leonim.picartaodecredito.core;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
@@ -21,30 +26,55 @@ import android.widget.TextView;
 
 import com.example.leonim.picartaodecredito.core.card_section.OnViewPostingsButtonClickListener;
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.dbo.CreditCard;
+import com.example.leonim.picartaodecredito.dbo.Invoice;
+import com.example.leonim.picartaodecredito.dbo.User;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.bind.SqlDateTypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.ResponseHandlerInterface;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
 
 public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    private TabLayout tabLayout;
+    public ArrayList<CreditCard> cards;
+    public User user;
+    private Intent intent;
+    private Gson gson;
+    private AsyncHttpClient httpClient;
+    private ProgressDialog dialog;
+    private int gottenCardsCount;
+    private boolean dialogActive;
+
+    private BillFragment billFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dialogActive = false;
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mViewPager = (ViewPager) findViewById(R.id.container);
         setSupportActionBar(toolbar);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -54,6 +84,220 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        gottenCardsCount = 0;
+
+        httpClient = new AsyncHttpClient();
+        httpClient.setEnableRedirects(true);
+        httpClient.setTimeout(6000);
+
+        dialog = new ProgressDialog(MainActivity.this);
+
+        gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
+
+        intent = getIntent();
+        cards = new ArrayList<>();
+
+
+
+    }
+
+    //block of code executed when all the application data are loaded
+    private void dataDidLoad(){
+        Log.d("App","Data Loaded");
+        /*Log.d("chubaka",cards.get(0).getNumber()+" | "+cards.get(0).getInvoiceArrayList()+"");
+        Log.d("chubaka",cards.get(1).getNumber()+" | "+cards.get(1).getInvoiceArrayList()+"");*/
+        enableFragments();
+        //refresh fragments recyclerviews
+    }
+
+    private void enableFragments(){
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        tabLayout.setupWithViewPager(mViewPager);
+        BillFragment billFragment = (BillFragment) mSectionsPagerAdapter.getItem(0);
+        dialog.dismiss();
+    }
+
+    private void requestApplicationData(){
+
+
+        dialog = ProgressDialog.show(MainActivity.this, "Getting your data...", "Please wait...",true);
+        RequestParams params = new RequestParams();
+        params.add("cpf",user.getCpf());
+        params.add("password",user.getPassword());
+
+        httpClient.post(ApplicationUtilities.URL + "/allCards", params, new AsyncHttpResponseHandler() {
+
+            String responseString;
+
+            private void loadResponseString(byte[] responseBody){
+                try{
+                    responseString = new String(responseBody,"UTF-8");
+                }catch (UnsupportedEncodingException e){}
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                loadResponseString(responseBody);
+
+                if(responseString.equals("1001") || responseString.equals("1002")){
+                    showExitingDialog();
+                }else{
+                    try{
+                        cards = gson.fromJson(responseString, new TypeToken<ArrayList<CreditCard>>(){}.getType());
+                        try{
+                            cards.size();
+                            cards.get(0).getBrand();
+                        }catch (Exception e){
+                            Log.d("BUG", "(getting cards): "+e.getMessage());
+                            showExitingDialog("Error parsing the server response (getting cards).");
+                        }
+                        putInvoicesInCards();
+
+                    }catch (Exception e){
+                        showExitingDialog(e.getMessage());
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                showExitingDialog("Status code:"+statusCode);
+            }
+        });
+
+    }
+
+    private void getUserData(){
+        if(intent.hasExtra("user")){
+            try{
+                Bundle b = intent.getExtras();
+
+                user = (User) b.get("user");
+                Log.d("uiu","deu certo tamanho: "+user.getCity());
+
+
+            }catch (Exception e){
+                Log.d("OIOI", "erro gson "+e.getMessage());
+            }
+        }else{
+            Log.d("uiu","sem user");
+        }
+    }
+
+    private void putInvoicesInCards(){
+        gottenCardsCount = 0;
+
+        for(CreditCard creditCard:cards){
+            RequestParams params = new RequestParams();
+            params.add("cpf",user.getCpf());
+            params.add("password",user.getPassword());
+            params.add("numberCard", creditCard.getNumber());
+
+            httpClient.post(ApplicationUtilities.URL + "/Invoices", params, new CustomAsyncHttpResponseHandler(creditCard));
+
+        }
+    }
+
+    private void showExitingDialog(){
+        dialog.dismiss();
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setMessage("Error loading the data from the server.");
+        builder1.setCancelable(false);
+
+        builder1.setPositiveButton(
+                "Go back to login",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private void showExitingDialog(String customMessage){
+        dialog.dismiss();
+        if(!dialogActive) {
+            dialogActive = true;
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("Error loading the data from the server.\n" + customMessage);
+            builder1.setCancelable(false);
+
+            builder1.setPositiveButton(
+                    "Go back to login",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialogActive = true;
+                            finish();
+                        }
+                    });
+
+
+            AlertDialog alert11 = builder1.create();
+
+            alert11.show();
+        }
+
+    }
+
+    private class CustomAsyncHttpResponseHandler extends AsyncHttpResponseHandler{
+
+        CreditCard currentCreditCard;
+        public CustomAsyncHttpResponseHandler(CreditCard currentCreditCard){
+            this.currentCreditCard=currentCreditCard;
+        }
+
+        String responseString;
+
+        private void loadResponseString(byte[] responseBody){
+            try{
+                responseString = new String(responseBody,"UTF-8");
+            }catch (UnsupportedEncodingException e){}
+        }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+            showExitingDialog("Status code:"+statusCode);
+        }
+
+        @Override
+        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+            loadResponseString(responseBody);
+
+
+            Log.d("JSONTEST",responseString);
+            if(responseString.equals("1001") || responseString.equals("1002")){
+                currentCreditCard.setInvoiceArrayList(new ArrayList<Invoice>());
+
+            }else{
+                try{
+
+                    currentCreditCard.setInvoiceArrayList((ArrayList<Invoice>) gson.fromJson(responseString, new TypeToken<ArrayList<Invoice>>(){}.getType()));
+                    try{
+                        currentCreditCard.getBrand();
+
+                    }catch (Exception e){
+                        showExitingDialog("Error parsing the server response (getting invoices).");
+                    }
+                }catch (Exception e){
+                    Log.d("TEST",e.getMessage());
+                    showExitingDialog(e.getMessage());
+                }
+
+            }
+            Log.d("chubaka","real "+cards.get(gottenCardsCount).getInvoiceArrayList());
+
+            //block after data parsing:
+            gottenCardsCount++;
+            if(gottenCardsCount==cards.size()){
+                dataDidLoad();
+            }
+        }
     }
 
     /**
@@ -73,7 +317,6 @@ public class MainActivity extends AppCompatActivity {
                 try{
 
                     mViewPager.setCurrentItem(0);
-                    BillFragment billFragment = (BillFragment) mSectionsPagerAdapter.getItem(0);
                     billFragment.switchListedCreditCard(creditCardNumber);
 
                 }catch(Exception e){
@@ -86,12 +329,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        getUserData();
+        requestApplicationData();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        dialog.dismiss();
+        super.onDestroy();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -103,8 +356,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
+        if (id == R.id.action_refresh) {
+            requestApplicationData();
             return true;
         }
 
@@ -139,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

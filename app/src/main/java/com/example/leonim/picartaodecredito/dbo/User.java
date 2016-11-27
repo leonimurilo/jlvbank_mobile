@@ -1,13 +1,15 @@
 package com.example.leonim.picartaodecredito.dbo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable{
     protected int id;
     protected String name;
     protected String cpf;
     protected String rg;
     protected String street;
+    protected String password;
     protected String city;
     protected String phone;
     protected double income;
@@ -29,6 +31,14 @@ public class User {
         this.registrationDate = registrationDate;
         this.dateBirth = dateBirth;
         this.status = status;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public int getId() {

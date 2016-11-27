@@ -1,5 +1,6 @@
 package com.example.leonim.picartaodecredito.dbo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /*
@@ -10,7 +11,7 @@ toString
 Hashcode
  */
 
-public class Release implements Comparable<Release> {
+public class Release implements Comparable<Release>, Serializable {
 
     protected int id;
     protected double value;

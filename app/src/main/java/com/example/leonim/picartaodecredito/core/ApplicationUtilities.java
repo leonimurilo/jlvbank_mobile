@@ -11,6 +11,7 @@ import java.util.Date;
 
 public class ApplicationUtilities {
 
+    public static String URL = "http://10.0.2.2:8080/jlvbank_war_exploded";
     public static String dateToResumedString(Date date){
         long ms = date.getTime();
         String resumeString = null;

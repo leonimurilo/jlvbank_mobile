@@ -1,5 +1,6 @@
 package com.example.leonim.picartaodecredito.dbo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -7,7 +8,7 @@ import java.util.Date;
  * Created by leonim on 22/10/2016.
  */
 
-public class Invoice {
+public class Invoice implements Serializable{
 
     private int id;
     private double value;

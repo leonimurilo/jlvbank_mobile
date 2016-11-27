@@ -23,8 +23,17 @@ public class MyRecyclerAdapterCardSelector extends RecyclerView.Adapter<MyRecycl
     private OnViewPostingsButtonClickListener onViewPostingsClickListener;
     private OnCardInteractionListener onCardInteractionListener;
 
-    public MyRecyclerAdapterCardSelector(ArrayList<CreditCard> creditCards, Context context){
+    public MyRecyclerAdapterCardSelector(ArrayList<CreditCard> creditCards, Context context)throws Exception{
         super();
+
+        if(context==null)
+            throw new Exception("Error. context is null");
+        if(creditCards==null)
+            throw new Exception("Error. arraylist is null");
+
+        if(creditCards.contains(null))
+            throw new Exception("Error. one of the credit cards is null");
+
         this.context = context;
         this.creditCards = creditCards;
 
