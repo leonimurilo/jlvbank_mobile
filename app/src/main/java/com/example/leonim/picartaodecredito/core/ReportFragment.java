@@ -17,6 +17,7 @@ import com.example.leonim.picartaodecredito.core.card_section.MyRecyclerAdapterC
 import com.example.leonim.picartaodecredito.core.card_section.OnCardInteractionListener;
 import com.example.leonim.picartaodecredito.core.card_section.OnViewPostingsButtonClickListener;
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.core.invoice_section.MyRecyclerAdapterBill;
 import com.example.leonim.picartaodecredito.dbo.CreditCard;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -36,9 +37,9 @@ public class ReportFragment extends android.support.v4.app.Fragment {
     private View myFragmentView;
     private RecyclerView cardSelectorRecyclerView;
     private MyRecyclerAdapterCardSelector adapterCardSelector;
-    private OnViewPostingsButtonClickListener onViewPostingsClickListener;
     private OnCardInteractionListener onLockCardButtonClickListener;
     private MainActivity myActivity;
+    protected OnViewPostingsButtonClickListener onViewPostingsButtonClickListener;
 
     public ReportFragment() {
         // Required empty public constructor
@@ -86,6 +87,7 @@ public class ReportFragment extends android.support.v4.app.Fragment {
 
         myFragmentView = inflater.inflate(R.layout.fragment_report, container, false);
 
+        //bloquear cartao
         onLockCardButtonClickListener = new OnCardInteractionListener() {
             View icon;
             void showLockIcon(){
@@ -93,33 +95,41 @@ public class ReportFragment extends android.support.v4.app.Fragment {
             }
 
             @Override
-            public void onLockCardButtonClicked(int id, View icon) {
+            public void onLockCardButtonClicked(CreditCard card, View icon) {
                 this.icon = icon;
                 AsyncHttpClient client = new AsyncHttpClient();
                 client.setEnableRedirects(true);
                 client.setTimeout(6000);
                 String url = "http://10.0.2.2:8080//teste_war_exploded/lock_card";
                 RequestParams params = new RequestParams();
-                params.add("id",id+"");
+                params.add("number",card.getNumber());
+                params.add("cpf",myActivity.user.getCpf());
+                params.add("password",myActivity.user.getPassword());
 
+                Log.d("LOGSON","vai postar");
                 client.post(url, params, new AsyncHttpResponseHandler() {
                     String responseString = "";
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
                         try {
                             responseString = new String(responseBody,"UTF-8");
+                            Log.d("LOGSON","sucesso: "+statusCode+"\n response:"+responseString);
                         } catch (UnsupportedEncodingException e) {
                             Snackbar.make(myFragmentView, "Error converting the response to string: "+responseBody, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                             e.printStackTrace();
                         }
-                        if(responseString.equals("1")){
-                            Log.d("HTTPTEST",responseString);
+                        if(responseString.equals("1000")){
+                            Snackbar.make(myFragmentView, "Card locked! If you want to unlock the card please contact the bank.", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                             showLockIcon();
+                        }else if(responseString.equals("1003")){
+                            //erro ao bloquear
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        Log.d("LOGSON","deu merda");
                         try {
                             responseString = new String(responseBody,"UTF-8");
                         } catch (UnsupportedEncodingException e) {
@@ -133,13 +143,29 @@ public class ReportFragment extends android.support.v4.app.Fragment {
             }
         };
 
+        //fim lock card
+
+        onViewPostingsButtonClickListener = new OnViewPostingsButtonClickListener() {
+            @Override
+            public void onViewPostingsClicked(CreditCard card) {
+                Log.d("espinou","Espinou main");
+                try{
+
+                    myActivity.mViewPager.setCurrentItem(0);
+                    myActivity.billFragment.switchListedCreditCard(card);
+
+                }catch(Exception e){
+                    Log.d("espinou",e.getMessage());
+                }
+            }
+        };
+
         return myFragmentView;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        onViewPostingsClickListener = ((MainActivity)getActivity()).getOnViewPostingsClickListener();
     }
 
     @Override
@@ -158,16 +184,24 @@ public class ReportFragment extends android.support.v4.app.Fragment {
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
         cardSelectorRecyclerView.setLayoutManager(layout);
 
+
+        setFragmentContent();
+
+    }
+
+    private void setFragmentContent(){
+        refreshRecyclerView();
+    }
+
+    private void refreshRecyclerView(){
         try{
             adapterCardSelector = new MyRecyclerAdapterCardSelector(myActivity.cards,this.getContext());
+            adapterCardSelector.setOnViewPostingsClickListener(onViewPostingsButtonClickListener);
+            adapterCardSelector.setOnLockCardButtonClickListener(onLockCardButtonClickListener);
+            cardSelectorRecyclerView.setAdapter(adapterCardSelector);
         }catch (Exception e){
 
         }
-
-        adapterCardSelector.setOnViewPostingsClickListener(onViewPostingsClickListener);
-        adapterCardSelector.setOnLockCardButtonClickListener(onLockCardButtonClickListener);
-
-        //cardSelectorRecyclerView.setAdapter(adapterCardSelector);
 
     }
 

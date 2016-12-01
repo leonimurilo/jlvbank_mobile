@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.dbo.CreditCard;
 
 /**
  * Created by leonim on 14/10/2016.
@@ -24,7 +25,7 @@ public class MyRecyclerViewHolderCardSelector extends RecyclerView.ViewHolder im
     private TextView cardTypeTextView;
     private OnViewPostingsButtonClickListener onViewPostingsClickListener;
     private OnCardInteractionListener onCardInteractionListener;
-    private int cardId;
+    private CreditCard card;
 
     public MyRecyclerViewHolderCardSelector(View view){
         super(view);
@@ -43,8 +44,8 @@ public class MyRecyclerViewHolderCardSelector extends RecyclerView.ViewHolder im
 
     }
 
-    public void setCardId(int cardId){
-        this.cardId = cardId;
+    public void setCardId(CreditCard card){
+        this.card = card;
     }
 
     public void setCardNumberText(String s){
@@ -72,12 +73,10 @@ public class MyRecyclerViewHolderCardSelector extends RecyclerView.ViewHolder im
         }
 
         if (view.getId() == this.buttonViewPostings.getId()){
-            onViewPostingsClickListener.onViewPostingsClicked(this.cardNumberTextView.getText().toString());
-            Toast.makeText(view.getContext(),"Switched to card number "+this.cardNumberTextView.getText().toString(),Toast.LENGTH_SHORT).show();
+            onViewPostingsClickListener.onViewPostingsClicked(this.card);
         }
-
         if(view.getId() == this.buttonLock.getId()){
-            onCardInteractionListener.onLockCardButtonClicked(cardId,lockIcon);
+            onCardInteractionListener.onLockCardButtonClicked(card,lockIcon);
         }
 
 

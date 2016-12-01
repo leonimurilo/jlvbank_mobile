@@ -3,7 +3,6 @@ package com.example.leonim.picartaodecredito.core;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,36 +23,28 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-import com.example.leonim.picartaodecredito.core.card_section.OnViewPostingsButtonClickListener;
 import com.example.leonim.picartaodecredito.R;
 import com.example.leonim.picartaodecredito.dbo.CreditCard;
 import com.example.leonim.picartaodecredito.dbo.Invoice;
 import com.example.leonim.picartaodecredito.dbo.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.SqlDateTypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.ResponseHandlerInterface;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
 
 public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+    protected ViewPager mViewPager;
     private TabLayout tabLayout;
-    public ArrayList<CreditCard> cards;
-    public User user;
+    protected ArrayList<CreditCard> cards;
+    protected User user;
     private Intent intent;
     private Gson gson;
     private AsyncHttpClient httpClient;
@@ -61,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private int gottenCardsCount;
     private boolean dialogActive;
 
-    private BillFragment billFragment;
+
+    protected BillFragment billFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,15 +89,11 @@ public class MainActivity extends AppCompatActivity {
         intent = getIntent();
         cards = new ArrayList<>();
 
-
-
-    }
+}
 
     //block of code executed when all the application data are loaded
     private void dataDidLoad(){
         Log.d("App","Data Loaded");
-        /*Log.d("chubaka",cards.get(0).getNumber()+" | "+cards.get(0).getInvoiceArrayList()+"");
-        Log.d("chubaka",cards.get(1).getNumber()+" | "+cards.get(1).getInvoiceArrayList()+"");*/
         enableFragments();
         //refresh fragments recyclerviews
     }
@@ -113,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
     private void enableFragments(){
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        billFragment = (BillFragment) mSectionsPagerAdapter.getItem(0);
         tabLayout.setupWithViewPager(mViewPager);
-        BillFragment billFragment = (BillFragment) mSectionsPagerAdapter.getItem(0);
         dialog.dismiss();
     }
 
@@ -176,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 Bundle b = intent.getExtras();
 
                 user = (User) b.get("user");
-                Log.d("uiu","deu certo tamanho: "+user.getCity());
+
 
 
             }catch (Exception e){
@@ -298,32 +286,6 @@ public class MainActivity extends AppCompatActivity {
                 dataDidLoad();
             }
         }
-    }
-
-    /**
-     * Method that returns an anonymous class that implements OnViewPostingsClickListener
-     * with the required methods.
-     *
-     * The overriden method set the viewPager currentItem to the invoice one
-     * and switch the showed credit card information to the one that belongs
-     * to the credit card received as argument
-     *
-     * @return  anonymous class that implements OnViewPostingsClickListener
-     */
-    public OnViewPostingsButtonClickListener getOnViewPostingsClickListener(){
-        return new OnViewPostingsButtonClickListener() {
-            @Override
-            public void onViewPostingsClicked(String creditCardNumber) {
-                try{
-
-                    mViewPager.setCurrentItem(0);
-                    billFragment.switchListedCreditCard(creditCardNumber);
-
-                }catch(Exception e){
-                    Log.d("Exception",e.getMessage());
-                }
-            }
-        };
     }
 
     @Override

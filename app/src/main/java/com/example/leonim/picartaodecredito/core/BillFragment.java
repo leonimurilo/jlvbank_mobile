@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
     private MainActivity myActivity;
     private ArrayList<String> reportOptions;
     private OnReleaseInteractionListener onReleaseInteractionListener;
+    private MyRecyclerAdapterBill myRecyclerAdapterBill;
 
     public BillFragment() {
         // Required empty public constructor
@@ -93,7 +95,19 @@ public class BillFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.d("started","fragmento iniciado");
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                refreshRecyclerView();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
         myActivity = ((MainActivity)getActivity());
 
         onReleaseInteractionListener = new OnReleaseInteractionListener() {
@@ -120,7 +134,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
 
     private void setFragmentContent(){
         refreshSpinnerOptions();
-        Log.d("chubaka","wtf1");
+
         refreshRecyclerView();
 
     }
@@ -128,10 +142,9 @@ public class BillFragment extends android.support.v4.app.Fragment {
 
     private void refreshRecyclerView(){
         int index = spinner.getSelectedItemPosition();
-        Log.d("chubaka","COMO TA: "+myActivity.cards.get(index).getInvoiceArrayList());
-        try{
 
-            MyRecyclerAdapterBill myRecyclerAdapterBill = new MyRecyclerAdapterBill(myActivity.cards.get(index).getInvoiceArrayList(),getContext(),onReleaseInteractionListener);
+        try{
+            myRecyclerAdapterBill = new MyRecyclerAdapterBill(myActivity.cards.get(index).getInvoiceArrayList(),getContext(),onReleaseInteractionListener);
             recyclerView.setAdapter(myRecyclerAdapterBill);
         }catch (Exception e){
 
@@ -140,7 +153,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
     }
 
     private void refreshSpinnerOptions(){
-        Log.d("chubaka","wtf2");
+
         reportOptions.clear();
         for(CreditCard creditCard:myActivity.cards){
             reportOptions.add(creditCard.getNumber()+"");
@@ -158,23 +171,33 @@ public class BillFragment extends android.support.v4.app.Fragment {
     }
 
 
+
+
+
     /**
      * Method that switch the listed credit card in the invoice fragment (this) when receive its identifier.
      * It switch the spinner selected item and also changes the recyclerView adapter to the one with the
      * wished data.
      *
-     * @param creditCardNumber creditCard identifier
+     * @param card creditCard
      */
-    public void switchListedCreditCard(String creditCardNumber){
+    public void switchListedCreditCard(CreditCard card){
         try{
-            Toast.makeText(getContext(),creditCardNumber,Toast.LENGTH_SHORT).show();
-
-            int index = reportOptions.indexOf(creditCardNumber);
+            int index = reportOptions.indexOf(card.getNumber());
             spinner.setSelection(index);
-            listAdapter = new MyRecyclerAdapterBill(myActivity.cards.get(index).getInvoiceArrayList(),this.getContext(),onReleaseInteractionListener);
+            refreshRecyclerView(index);
+        }catch (Exception e){
+
+        }
+    }
+
+    public void refreshRecyclerView(int cardIndex){
+        try{
+            listAdapter = new MyRecyclerAdapterBill(myActivity.cards.get(cardIndex).getInvoiceArrayList(),this.getContext(),onReleaseInteractionListener);
             recyclerView.setAdapter(listAdapter);
         }catch (Exception e){
-            Log.d("Exception",e.getMessage());
+
         }
+
     }
 }

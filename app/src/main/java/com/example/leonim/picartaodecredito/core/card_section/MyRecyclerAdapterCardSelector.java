@@ -72,7 +72,7 @@ public class MyRecyclerAdapterCardSelector extends RecyclerView.Adapter<MyRecycl
         CreditCard creditCard = creditCards.get(position);
         holder.setCardNumberText(creditCard.getNumber());
         holder.setCardTypeText(creditCard.getClassification());
-        holder.setCardId(creditCard.getId());
+        holder.setCardId(creditCard);
 
     }
 }

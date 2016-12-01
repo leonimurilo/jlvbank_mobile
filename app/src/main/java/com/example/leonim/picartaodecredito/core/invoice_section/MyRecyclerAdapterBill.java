@@ -86,7 +86,6 @@ public class MyRecyclerAdapterBill extends RecyclerView.Adapter {
 
         if(h.getClass()==MyRecyclerViewHolderBill.class){
 
-            Log.d("CRASH",""+subtractor);
             //retirar quantidade de lancamentos anteriores alem de quantidade de trecos
             int previousReleases = 0;
             for(int i=0;i<subtractor-1;i++){
