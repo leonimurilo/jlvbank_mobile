@@ -1,6 +1,7 @@
 package com.example.leonim.picartaodecredito.core;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,13 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.leonim.picartaodecredito.core.card_section.MyRecyclerAdapterCardSelector;
 import com.example.leonim.picartaodecredito.core.card_section.OnCardInteractionListener;
 import com.example.leonim.picartaodecredito.core.card_section.OnViewPostingsButtonClickListener;
 import com.example.leonim.picartaodecredito.R;
-import com.example.leonim.picartaodecredito.core.invoice_section.MyRecyclerAdapterBill;
 import com.example.leonim.picartaodecredito.dbo.CreditCard;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -25,10 +24,8 @@ import com.loopj.android.http.RequestParams;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.client.HttpClient;
 
 
 public class ReportFragment extends android.support.v4.app.Fragment {
@@ -89,24 +86,34 @@ public class ReportFragment extends android.support.v4.app.Fragment {
 
         //bloquear cartao
         onLockCardButtonClickListener = new OnCardInteractionListener() {
+            @Override
+            public void onCardDetailsButtonClicked(CreditCard card) {
+                Intent i = new Intent(getContext(),CardDetailsActivity.class);
+                i.putExtra("card",card);
+                startActivity(i);
+            }
+
             View icon;
-            void showLockIcon(){
+            View button;
+            void updateLockedCardUI(){
                 icon.setVisibility(View.VISIBLE);
+                this.button.setEnabled(false);
+                this.button.setVisibility(View.GONE);
             }
 
             @Override
-            public void onLockCardButtonClicked(CreditCard card, View icon) {
+            public void onLockCardButtonClicked(CreditCard card, View icon, View button) {
                 this.icon = icon;
+                this.button = button;
                 AsyncHttpClient client = new AsyncHttpClient();
                 client.setEnableRedirects(true);
                 client.setTimeout(6000);
-                String url = "http://10.0.2.2:8080//teste_war_exploded/lock_card";
+                String url = ApplicationUtilities.URL + ApplicationUtilities.LOCK_CARD_ROUTE;
                 RequestParams params = new RequestParams();
                 params.add("number",card.getNumber());
                 params.add("cpf",myActivity.user.getCpf());
                 params.add("password",myActivity.user.getPassword());
 
-                Log.d("LOGSON","vai postar");
                 client.post(url, params, new AsyncHttpResponseHandler() {
                     String responseString = "";
                     @Override
@@ -114,14 +121,13 @@ public class ReportFragment extends android.support.v4.app.Fragment {
 
                         try {
                             responseString = new String(responseBody,"UTF-8");
-                            Log.d("LOGSON","sucesso: "+statusCode+"\n response:"+responseString);
                         } catch (UnsupportedEncodingException e) {
                             Snackbar.make(myFragmentView, "Error converting the response to string: "+responseBody, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                             e.printStackTrace();
                         }
                         if(responseString.equals("1000")){
                             Snackbar.make(myFragmentView, "Card locked! If you want to unlock the card please contact the bank.", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-                            showLockIcon();
+                            updateLockedCardUI();
                         }else if(responseString.equals("1003")){
                             //erro ao bloquear
                         }
@@ -129,12 +135,12 @@ public class ReportFragment extends android.support.v4.app.Fragment {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        Log.d("LOGSON","deu merda");
+                        Log.d("LOGSON","deu merda"+statusCode);
                         try {
                             responseString = new String(responseBody,"UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             Snackbar.make(myFragmentView, "Error converting the response to string: "+responseBody, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-                            e.printStackTrace();
+
                         }
                     }
                 });

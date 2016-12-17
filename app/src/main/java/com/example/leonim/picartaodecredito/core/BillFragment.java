@@ -52,32 +52,32 @@ public class BillFragment extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-        //Log.d("DEBUG_LOLA,","onCreate");
+        Log.d("DEBUG_LOLA,","onCreate");
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
-        //Log.d("DEBUG_LOLA,","onPause");
+        Log.d("DEBUG_LOLA,","onPause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //Log.d("DEBUG_LOLA,","onStop");
+        Log.d("DEBUG_LOLA,","onStop");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //Log.d("DEBUG_LOLA,","onResume");
+        Log.d("DEBUG_LOLA,","onResume");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //Log.d("DEBUG_LOLA,","onStart");
+        Log.d("DEBUG_LOLA,","onStart");
     }
 
     @Override
@@ -86,15 +86,14 @@ public class BillFragment extends android.support.v4.app.Fragment {
 
         recyclerView = (RecyclerView) myFragmentView.findViewById(R.id.bill_recycler);
         spinner = (Spinner) myFragmentView.findViewById(R.id.choose_card_spinner);
-
-        reportOptions = new ArrayList<>();
+        Log.d("DEBUG_LOLA,","onCreateView");
         return myFragmentView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d("DEBUG_LOLA,","onViewCreated");
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -107,6 +106,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
             }
         });
 
+        reportOptions = new ArrayList<>();
 
         myActivity = ((MainActivity)getActivity());
 
@@ -115,11 +115,7 @@ public class BillFragment extends android.support.v4.app.Fragment {
             public void onReleaseSelected(Release r) {
                 //open detail activity
                 Intent i = new Intent(getContext(),PostingDetailsActivity.class);
-                i.putExtra("releaseValue",r.getValue());
-                i.putExtra("releaseType",r.getType());
-                i.putExtra("releaseDescription",r.getDescription());
-                i.putExtra("releaseDate",new SimpleDateFormat("dd/MM/yy").format(r.getDate()));
-
+                i.putExtra("release",r);
                 startActivity(i);
 
             }
@@ -128,13 +124,12 @@ public class BillFragment extends android.support.v4.app.Fragment {
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layout);
         setFragmentContent();
-
-
     }
+
+
 
     private void setFragmentContent(){
         refreshSpinnerOptions();
-
         refreshRecyclerView();
 
     }
@@ -153,12 +148,13 @@ public class BillFragment extends android.support.v4.app.Fragment {
     }
 
     private void refreshSpinnerOptions(){
-
+        Log.d("espinou", "dando refresh no spinner");
         reportOptions.clear();
         for(CreditCard creditCard:myActivity.cards){
             reportOptions.add(creditCard.getNumber()+"");
         }
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getContext(),android.R.layout.simple_spinner_dropdown_item,reportOptions);
+        Log.d("espinou", "THIS PRO TRECO:"+this);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_dropdown_item,reportOptions);
         spinner.setAdapter(spinnerAdapter);
     }
 
@@ -170,10 +166,6 @@ public class BillFragment extends android.support.v4.app.Fragment {
         listAdapter.notifyDataSetChanged();
     }
 
-
-
-
-
     /**
      * Method that switch the listed credit card in the invoice fragment (this) when receive its identifier.
      * It switch the spinner selected item and also changes the recyclerView adapter to the one with the
@@ -183,11 +175,13 @@ public class BillFragment extends android.support.v4.app.Fragment {
      */
     public void switchListedCreditCard(CreditCard card){
         try{
+            Log.d("espinou", "THIS PRO switch:"+this);
+            Log.d("espinou", ""+reportOptions);
             int index = reportOptions.indexOf(card.getNumber());
             spinner.setSelection(index);
             refreshRecyclerView(index);
         }catch (Exception e){
-
+            Log.d("LOGSON", e.getMessage());
         }
     }
 

@@ -20,20 +20,20 @@
 
         <TextView
             android:layout_alignParentLeft="true"
-            android:id="@+id/release_value_desc"
+            android:id="@+id/card_number_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="Value:"/>
+            android:text="Number:"/>
 
         <TextView
-            android:id="@+id/release_value"
+            android:id="@+id/card_number"
             android:layout_marginLeft="10dp"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="R$ 198,90"
+            android:text="XXXX-XXXX-XXXX-3333"
             />
     </LinearLayout>
 
@@ -46,20 +46,20 @@
 
         <TextView
             android:layout_alignParentLeft="true"
-            android:id="@+id/release_type_desc"
+            android:id="@+id/card_date_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="Type:"/>
+            android:text="Due date:"/>
 
         <TextView
-            android:id="@+id/release_type"
+            android:id="@+id/card_date"
             android:layout_marginLeft="10dp"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Purchase"
+            android:text="29/11/2016"
             />
     </LinearLayout>
 
@@ -72,20 +72,20 @@
 
         <TextView
             android:layout_alignParentLeft="true"
-            android:id="@+id/release_date_desc"
+            android:id="@+id/card_brand_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="Date:"/>
+            android:text="Brand:"/>
 
         <TextView
-            android:id="@+id/release_date"
+            android:id="@+id/card_brand"
             android:layout_marginLeft="10dp"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="15/11/2016"
+            android:text="VISA"
             />
     </LinearLayout>
 
@@ -98,20 +98,20 @@
 
         <TextView
             android:layout_alignParentLeft="true"
-            android:id="@+id/release_time_desc"
+            android:id="@+id/card_edition_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="When:"/>
+            android:text="Edition:"/>
 
         <TextView
-            android:id="@+id/release_time"
+            android:id="@+id/card_edition"
             android:layout_marginLeft="10dp"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9 days ago"
+            android:text="GOLD"
             />
     </LinearLayout>
 
@@ -119,26 +119,103 @@
         android:padding="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:gravity="center_vertical">
 
         <TextView
             android:layout_alignParentLeft="true"
-            android:id="@+id/release_description_desc"
+            android:id="@+id/card_status_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="Description:"/>
+            android:text="Status:"/>
 
         <TextView
-            android:id="@+id/release_description"
-            android:layout_marginTop="5dp"
+            android:id="@+id/card_status"
+            android:layout_marginLeft="10dp"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="The idiosyncrasy of this town is smoke. It rolls sullenly in slow folds from the great chimneys of the iron-foundries, and settles down in black, slimy pools on the muddy streets. Smoke on the wharves, smoke on the dingy boats, on the yellow river--clinging in a coating of greasy soot to the house-front, the two faded poplars, the faces of the passers-by.
-Read more at http://examples.yourdictionary.com/descriptive-text-examples.html#2RocyRGEvA6dKM2I.99"
+            android:text="Unlocked"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:id="@+id/card_release_amount_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:text="Total releases:"/>
+
+        <TextView
+            android:id="@+id/card_release_amount"
+            android:layout_marginLeft="10dp"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="34"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:id="@+id/card_current_release_amount_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:text="Current month releases:"/>
+
+        <TextView
+            android:id="@+id/card_current_release_amount"
+            android:layout_marginLeft="10dp"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:id="@+id/card_invoice_amount_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:text="Amount of invoices:"/>
+
+        <TextView
+            android:id="@+id/card_invoice_amount"
+            android:layout_marginLeft="10dp"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
             />
     </LinearLayout>
 

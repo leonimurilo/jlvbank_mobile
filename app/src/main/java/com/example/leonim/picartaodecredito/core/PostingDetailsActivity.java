@@ -3,9 +3,14 @@ package com.example.leonim.picartaodecredito.core;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.leonim.picartaodecredito.R;
+import com.example.leonim.picartaodecredito.dbo.CreditCard;
+import com.example.leonim.picartaodecredito.dbo.Release;
+
+import java.text.SimpleDateFormat;
 
 
 /**
@@ -17,7 +22,8 @@ public class PostingDetailsActivity extends AppCompatActivity {
     private TextView typeTextView;
     private TextView descriptionTextView;
     private TextView dateTextView;
-
+    private TextView timeTextView;
+    protected Release release;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,19 +33,24 @@ public class PostingDetailsActivity extends AppCompatActivity {
         typeTextView = (TextView) findViewById(R.id.release_type);
         descriptionTextView = (TextView) findViewById(R.id.release_description);
         dateTextView = (TextView) findViewById(R.id.release_date);
+        timeTextView = (TextView) findViewById(R.id.release_time);
 
 
         Intent intent = getIntent();
-        //check existence
-        double releaseId = intent.getDoubleExtra("releaseValue",-1);
-        String date = intent.getStringExtra("releaseType");
-        String description = intent.getStringExtra("releaseDescription");
-        String type = intent.getStringExtra("releaseDate");
 
-        valueTextView.setText(releaseId+"");
-        descriptionTextView.setText(description);
-        typeTextView.setText(type);
-        dateTextView.setText(date);
+
+        if(intent.hasExtra("release")){
+            Bundle b = intent.getExtras();
+            release = (Release) b.get("release");
+
+            valueTextView.setText(release.getValue()+"");
+            Log.d("teste22",release.getValue()+"");
+            descriptionTextView.setText(release.getDescription());
+            typeTextView.setText(release.getType());
+            dateTextView.setText(new SimpleDateFormat("dd/MM/yy").format(release.getDate()));
+            timeTextView.setText(ApplicationUtilities.dateToResumedString(release.getDate()));
+        }
+
     }
 
 

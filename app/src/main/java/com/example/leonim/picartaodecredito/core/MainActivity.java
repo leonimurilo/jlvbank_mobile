@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog dialog;
     private int gottenCardsCount;
     private boolean dialogActive;
+    protected int currentFragment;
 
 
     protected BillFragment billFragment;
@@ -61,10 +62,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dialogActive = false;
+        currentFragment = 0;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mViewPager = (ViewPager) findViewById(R.id.container);
         setSupportActionBar(toolbar);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                currentFragment = position;
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                currentFragment = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -99,22 +119,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enableFragments(){
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
         mViewPager.setAdapter(mSectionsPagerAdapter);
         billFragment = (BillFragment) mSectionsPagerAdapter.getItem(0);
         tabLayout.setupWithViewPager(mViewPager);
+        mViewPager.setCurrentItem(currentFragment);
         dialog.dismiss();
     }
 
     private void requestApplicationData(){
-
 
         dialog = ProgressDialog.show(MainActivity.this, "Getting your data...", "Please wait...",true);
         RequestParams params = new RequestParams();
         params.add("cpf",user.getCpf());
         params.add("password",user.getPassword());
 
-        httpClient.post(ApplicationUtilities.URL + "/allCards", params, new AsyncHttpResponseHandler() {
+        httpClient.post(ApplicationUtilities.URL + ApplicationUtilities.ALL_CARDS_ROUTE, params, new AsyncHttpResponseHandler() {
 
             String responseString;
 
@@ -184,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             params.add("password",user.getPassword());
             params.add("numberCard", creditCard.getNumber());
 
-            httpClient.post(ApplicationUtilities.URL + "/Invoices", params, new CustomAsyncHttpResponseHandler(creditCard));
+            httpClient.post(ApplicationUtilities.URL + ApplicationUtilities.INVOICES_ROUTE, params, new CustomAsyncHttpResponseHandler(creditCard));
 
         }
     }
@@ -298,6 +318,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("teste22",currentFragment+"");
+        mViewPager.setCurrentItem(currentFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         dialog.dismiss();
         super.onDestroy();
@@ -366,6 +398,7 @@ public class MainActivity extends AppCompatActivity {
             if(position==0){
                 if(one == null)
                     one = BillFragment.newInstance();
+                Log.d("espinou", "BILL FRAGMENT: "+one);
                 return one;
             }
 

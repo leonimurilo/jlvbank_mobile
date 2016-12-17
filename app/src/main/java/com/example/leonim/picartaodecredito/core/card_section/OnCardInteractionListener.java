@@ -17,5 +17,6 @@ public interface OnCardInteractionListener {
     /**
      * Method called when the lock card button is clicked in the credit card viewHolder
      */
-    void onLockCardButtonClicked(CreditCard card, View icon);
+    void onLockCardButtonClicked(CreditCard card, View icon, View button);
+    void onCardDetailsButtonClicked(CreditCard card);
 }

@@ -44,8 +44,15 @@ public class MyRecyclerViewHolderCardSelector extends RecyclerView.ViewHolder im
 
     }
 
-    public void setCardId(CreditCard card){
+    public void setCard(CreditCard card){
         this.card = card;
+        //if false, is locked
+        if(!card.isStatus()){
+            this.lockIcon.setVisibility(View.VISIBLE);
+            this.buttonLock.setEnabled(false);
+            this.buttonLock.setVisibility(View.GONE);
+        }
+
     }
 
     public void setCardNumberText(String s){
@@ -69,14 +76,15 @@ public class MyRecyclerViewHolderCardSelector extends RecyclerView.ViewHolder im
     public void onClick(View view) {
 
         if (view.getId() == this.buttonMore.getId()){
-            Toast.makeText(view.getContext(), "ITEM PRESSED =  " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            onCardInteractionListener.onCardDetailsButtonClicked(card);
         }
 
         if (view.getId() == this.buttonViewPostings.getId()){
             onViewPostingsClickListener.onViewPostingsClicked(this.card);
         }
         if(view.getId() == this.buttonLock.getId()){
-            onCardInteractionListener.onLockCardButtonClicked(card,lockIcon);
+            onCardInteractionListener.onLockCardButtonClicked(card, lockIcon, buttonLock);
+            this.buttonLock.setEnabled(false);
         }
 
 
