@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private int gottenCardsCount;
     private boolean dialogActive;
     protected int currentFragment;
-
-
     protected BillFragment billFragment;
 
     @Override
